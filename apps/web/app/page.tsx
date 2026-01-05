@@ -1,6 +1,7 @@
 import Image, { type ImageProps } from "next/image";
 import { Button } from "@repo/ui/button";
 import styles from "./page.module.css";
+import { connectDB, User } from "@repo/db";
 
 type Props = Omit<ImageProps, "src"> & {
   srcLight: string;
@@ -18,9 +19,12 @@ const ThemeImage = (props: Props) => {
   );
 };
 
-export default function Home() {
+export default  async function Home() {
+  await connectDB();
+  const users = await User.find();
   return (
     <div className={styles.page}>
+      {JSON.stringify(users)}
       <main className={styles.main}>
         <ThemeImage
           className={styles.logo}
