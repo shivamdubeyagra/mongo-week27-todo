@@ -165,7 +165,7 @@ app.get("/", (req: Request, res: Response) => {
     </form>
 
     <div class="links">
-      <a href="/users">View Users (JSON)</a>
+      <a href="/users-ui">View Users</a>
       <a href="/health">Health Check</a>
     </div>
 
@@ -216,6 +216,104 @@ app.get("/", (req: Request, res: Response) => {
   `);
 });
 
+// ---------- Users UI (Human Friendly) ----------
+app.get("/users-ui", async (_req: Request, res: Response) => {
+  try {
+    const users = await User.find();
+
+    res.setHeader("Content-Type", "text/html");
+
+    const rows = users.map(
+      (u, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td>${u.name}</td>
+          <td>${u.email}</td>
+        </tr>
+      `
+    ).join("");
+
+    res.send(`
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Users</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6fb;
+      padding: 40px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 30px;
+    }
+
+    table {
+      width: 100%;
+      max-width: 700px;
+      margin: auto;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+    }
+
+    th, td {
+      padding: 14px;
+      text-align: left;
+    }
+
+    th {
+      background: #4f46e5;
+      color: white;
+    }
+
+    tr:nth-child(even) {
+      background: #f2f2f2;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 25px;
+      color: #666;
+      font-size: 14px;
+    }
+
+    a {
+      color: #4f46e5;
+      text-decoration: none;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  <h1>👥 Users List</h1>
+
+  <table>
+    <tr>
+      <th>#</th>
+      <th>Name</th>
+      <th>Email</th>
+    </tr>
+    ${rows || `<tr><td colspan="3">No users found</td></tr>`}
+  </table>
+
+  <footer>
+    <br/>
+    <a href="/">⬅ Back to Home</a>
+  </footer>
+</body>
+</html>
+    `);
+  } catch (err) {
+    res.status(500).send("Something went wrong");
+  }
+});
 
 
 // GET users
