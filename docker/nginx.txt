@@ -1,0 +1,36 @@
+server {
+    listen 80;
+    server_name prod-http.shivamdev.online;
+
+    # --- CERTBOT CHALLENGE (DO NOT PROXY) ---
+    location ^~ /.well-known/acme-challenge/ {
+        alias /var/www/certbot/.well-known/acme-challenge/;
+        default_type text/plain;
+        try_files $uri =404;
+    }
+
+    # --- APP TRAFFIC ---
+    location / {
+        proxy_pass http://backend:4000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $remote_addr;
+    }
+}
+# ---------------- HTTPS ----------------
+server {
+    listen 443 ssl;
+    server_name prod-http.shivamdev.online;
+
+    ssl_certificate /etc/letsencrypt/live/prod-http.shivamdev.online/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/prod-http.shivamdev.online/privkey.pem;
+
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_prefer_server_ciphers on;
+
+    location / {
+        proxy_pass http://backend:4000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Forwarded-For $remote_addr;
+        proxy_set_header X-Forwarded-Proto https;
+    }
+}

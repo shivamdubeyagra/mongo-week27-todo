@@ -1,11 +1,23 @@
 version: "3.9"
 
 services:
-  backend:
-    image: shivamdubeyagra/todo-app-backend:615786995063612da88d3430e5de28d057304171
-    container_name: http-backend
+  nginx:
+    image: nginx:stable
+    container_name: nginx
     ports:
-      - "4000:4000"
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx:/etc/nginx/conf.d
+      - ./certbot/www:/var/www/certbot
+      - ./certbot/conf:/etc/letsencrypt
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  backend:
+    image: shivamdubeyagra/todo-app-backend:7f6eb9e35723dfa1ae6f4326331bac13b60462c0
+    container_name: http-backend
     environment:
       MONGO_URI: mongodb://mongo:27017/turbo-db
       PORT: 4000
