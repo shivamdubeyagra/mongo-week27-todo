@@ -1,0 +1,22 @@
+FROM oven/bun:1
+
+WORKDIR /usr/src/app
+
+# Copy only required workspace files
+COPY package.json bun.lock turbo.json ./
+
+# Copy shared packages (if backend depends on them)
+COPY packages ./packages
+
+# Copy ONLY backend app
+COPY apps/web ./apps/web
+
+# Install dependencies
+RUN bun install
+# RUN bun run build
+# Move to backend directory
+# WORKDIR /usr/src/app/apps/http-backend
+
+EXPOSE 4001
+
+CMD ["bun", "run", "start:web"]
