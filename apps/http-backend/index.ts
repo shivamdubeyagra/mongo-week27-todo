@@ -64,7 +64,7 @@ app.get("/", (req: Request, res: Response) => {
 
     p {
       opacity: 0.9;
-      margin-bottom: 25px;
+      margin-bottom: 20px;
       line-height: 1.5;
     }
 
@@ -75,7 +75,51 @@ app.get("/", (req: Request, res: Response) => {
       padding: 8px 16px;
       border-radius: 999px;
       font-weight: 600;
-      margin-bottom: 30px;
+      margin-bottom: 25px;
+    }
+
+    form {
+      margin-top: 20px;
+      text-align: left;
+    }
+
+    label {
+      font-size: 0.85rem;
+      opacity: 0.85;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      margin-top: 6px;
+      margin-bottom: 14px;
+      border-radius: 10px;
+      border: none;
+      outline: none;
+      font-size: 0.95rem;
+    }
+
+    button {
+      width: 100%;
+      padding: 12px;
+      border-radius: 12px;
+      border: none;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      background: #22c55e;
+      color: #062e16;
+      transition: all 0.25s ease;
+    }
+
+    button:hover {
+      background: #16a34a;
+      transform: translateY(-1px);
+    }
+
+    .message {
+      margin-top: 15px;
+      font-size: 0.9rem;
     }
 
     .links a {
@@ -92,7 +136,6 @@ app.get("/", (req: Request, res: Response) => {
     .links a:hover {
       background: white;
       color: #4f46e5;
-      transform: translateY(-2px);
     }
 
     footer {
@@ -106,23 +149,73 @@ app.get("/", (req: Request, res: Response) => {
 <body>
   <div class="card">
     <h1>🚀 Turbo Backend</h1>
-    <p>A clean Express + Mongo backend running inside Docker.</p>
+    <p>Express + Mongo backend running securely in Docker.</p>
 
     <div class="status">✅ Server is Healthy</div>
 
+    <form id="userForm">
+      <label>Name</label>
+      <input type="text" id="name" placeholder="Enter name" required />
+
+      <label>Email</label>
+      <input type="email" id="email" placeholder="Enter email" required />
+
+      <button type="submit">Add User</button>
+      <div class="message" id="message"></div>
+    </form>
+
     <div class="links">
+      <a href="/users">View Users (JSON)</a>
       <a href="/health">Health Check</a>
-      <a href="/users">View Users</a>
     </div>
 
     <footer>
-      Powered by Node · Express · Docker
+      Powered by Express · MongoDB · Docker · HTTPS
     </footer>
   </div>
+
+  <script>
+    const form = document.getElementById("userForm");
+    const message = document.getElementById("message");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const name = document.getElementById("name").value;
+      const email = document.getElementById("email").value;
+
+      message.textContent = "Saving user...";
+      message.style.color = "#fff";
+
+      try {
+        const res = await fetch("/users", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ name, email })
+        });
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.message || "Something went wrong");
+        }
+
+        message.textContent = "✅ User added successfully";
+        message.style.color = "#22c55e";
+        form.reset();
+      } catch (err) {
+        message.textContent = "❌ " + err.message;
+        message.style.color = "#f87171";
+      }
+    });
+  </script>
 </body>
 </html>
   `);
 });
+
 
 
 // GET users
