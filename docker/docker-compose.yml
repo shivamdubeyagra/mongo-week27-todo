@@ -16,7 +16,7 @@ services:
     restart: unless-stopped
 
   backend:
-    image: shivamdubeyagra/todo-app-backend:7f6eb9e35723dfa1ae6f4326331bac13b60462c0
+    image: shivamdubeyagra/todo-app-backend:${IMAGE_TAG}
     container_name: http-backend
     environment:
       MONGO_URI: mongodb://mongo:27017/turbo-db
